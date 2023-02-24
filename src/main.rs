@@ -20,7 +20,7 @@ fn add_task(task: Json<Task<'_>>) -> &'static str {
     let mut tasks = OpenOptions::new().read(true).append(true).create(true).open("task.txt").expect("task.txt not accessible.");
     let task_item_string = format!("{}\n", task.item);
     let task_item_bytes = task_item_string.as_bytes();
-    tasks.write(task_item_bytes).expect("Unable to write to task.txt");
+    tasks.write_all(task_item_bytes).expect("Unable to write to task.txt");
     "Task added successfully."
 }
 
@@ -34,7 +34,21 @@ fn read_tasks() -> Json<Vec<String>> {
     //Json(reader.read_line().map(|line|line.expect("Could not read line")).collect())
 }
 
+pub fn adder(a: i32, b: i32) -> i32 {
+    a + b
+}
+
 #[launch]
 fn rocket() -> _ {
     rocket::build().mount("/",routes![index, add_task, read_tasks])
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+   
+   #[test]
+   fn test_adder() {
+    assert_eq!(adder(1,2), 3);
+   }
 }
